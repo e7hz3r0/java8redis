@@ -12,30 +12,30 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class J8Redis {
-	private static final String LOCALHOST = "127.0.0.1";
-	private static final int DEFAULT_PORT = 6379;
-	
-	private String host;
-	private int port;
-	private ChannelFuture future;
-	private Bootstrap bootstrap;
+    private static final String LOCALHOST = "127.0.0.1";
+    private static final int DEFAULT_PORT = 6379;
 
-	public J8Redis() {
-		this(LOCALHOST);
-	}
-	
-	public J8Redis(String host) {
-		this(host, DEFAULT_PORT);
-	}
-	
-	public J8Redis(String host, int port) {
-		this.host = host;
-		this.port = port;
-	}
-	
-	public void connect() {
-		EventLoopGroup workerGroup = new NioEventLoopGroup();
-		try {
+    private String host;
+    private int port;
+    private ChannelFuture future;
+    private Bootstrap bootstrap;
+
+    public J8Redis() {
+        this(LOCALHOST);
+    }
+
+    public J8Redis(String host) {
+        this(host, DEFAULT_PORT);
+    }
+
+    public J8Redis(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public void connect() {
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try {
             bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
             bootstrap.channel(NioSocketChannel.class);
@@ -43,16 +43,16 @@ public class J8Redis {
             bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    
+
                 }
             });
             future = bootstrap.connect(host, port);
-		} finally {
+        } finally {
             workerGroup.shutdownGracefully();
-		}
-	}
-	
-	public void disconnect() {
+        }
+    }
+
+    public void disconnect() {
         try {
             if (future != null && future.channel() != null) {
                 future.channel().close();
@@ -60,13 +60,13 @@ public class J8Redis {
         } catch (Exception e) {
             e.printStackTrace();
         }
-	}
-	
-	public String getHost() {
-		return this.host;
-	}
-	
-	public int getPort() {
-		return this.port;
-	}
+    }
+
+    public String getHost() {
+        return this.host;
+    }
+
+    public int getPort() {
+        return this.port;
+    }
 }
