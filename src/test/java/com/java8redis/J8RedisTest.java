@@ -67,8 +67,7 @@ public class J8RedisTest {
 			new NonStrictExpectations() {{
 				bootstrap.connect(anyString, anyInt); returns(future);
 				future.channel(); returns(channel);
-				channel.disconnect(); times = 1;
-				future.sync(); times = 1;
+				channel.close(); times = 1;
 			}};
 		
             J8Redis redis = new J8Redis();
@@ -76,10 +75,9 @@ public class J8RedisTest {
             redis.disconnect();
 
             new Verifications() {{
-                channel.disconnect(); times = 1;
-				future.sync(); times = 1;
+                channel.close(); times = 1;
             }};
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			fail("Unexpected exception");
 		}
 	}
