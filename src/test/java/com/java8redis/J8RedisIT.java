@@ -35,9 +35,18 @@ public class J8RedisIT {
 
     @Test
     public void test() {
+        String key = "MyKey";
+        String value = "Myvalue";
         J8Redis redis = new J8Redis("127.0.0.1");
         redis.connect();
-        redis.disconnect();
+        redis.set(key, value, (errorMsg) -> {
+          if (errorMsg == null) {
+              redis.disconnect();
+          } else {
+              redis.disconnect();
+              fail("Unexpected error: " + errorMsg);
+          }
+        });
     }
 
 }

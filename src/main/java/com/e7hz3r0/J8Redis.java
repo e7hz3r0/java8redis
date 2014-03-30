@@ -1,5 +1,7 @@
 package com.e7hz3r0;
 
+import java.util.function.Consumer;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -60,6 +62,10 @@ public class J8Redis {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public void set(String key, String value, Consumer<String> listener) {
+        listener.accept(null);
     }
 
     public String getHost() {
