@@ -78,6 +78,8 @@ public class J8RedisTest {
                     future.channel();
                     returns(channel);
                     channel.close();
+                    returns(future);
+                    future.sync();
                     times = 1;
                 }
             };
@@ -89,6 +91,8 @@ public class J8RedisTest {
             new Verifications() {
                 {
                     channel.close();
+                    times = 1;
+                    future.sync();
                     times = 1;
                 }
             };

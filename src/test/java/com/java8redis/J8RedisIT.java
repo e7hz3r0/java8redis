@@ -41,6 +41,9 @@ public class J8RedisIT {
         redis.connect();
         redis.set(key, value, (errorMsg) -> {
           if (errorMsg == null) {
+        	  redis.get(key, val -> {
+        		 assertEquals(value, val); 
+        	  });
               redis.disconnect();
           } else {
               redis.disconnect();
