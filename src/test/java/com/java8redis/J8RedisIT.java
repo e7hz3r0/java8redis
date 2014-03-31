@@ -36,16 +36,23 @@ public class J8RedisIT {
     @Test
     public void test() {
         String key = "MyKey";
+        String key2 = "MyKey2";
         String value = "Myvalue";
+        String value2 = "Myvalue2";
+
         J8Redis redis = new J8Redis("127.0.0.1");
         redis.connect();
         redis.set(key, value, (errorMsg) -> {
-          if (errorMsg == null) {
-              redis.disconnect();
-          } else {
-              redis.disconnect();
-              fail("Unexpected error: " + errorMsg);
-          }
+            assertNull(errorMsg);
+
+            redis.set(key2, value2, (errorMsg2) -> {
+                assertNull(errorMsg2);
+
+                redis.get(key, (val) -> {
+                    assertEquals(value, val); 
+                    redis.disconnect();
+                });
+            });
         });
     }
 

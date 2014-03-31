@@ -1,5 +1,8 @@
 package com.e7hz3r0;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import io.netty.bootstrap.Bootstrap;
@@ -21,6 +24,8 @@ public class J8Redis {
     private int port;
     private ChannelFuture future;
     private Bootstrap bootstrap;
+    
+    private Map<String, String> map;
 
     public J8Redis() {
         this(LOCALHOST);
@@ -33,6 +38,7 @@ public class J8Redis {
     public J8Redis(String host, int port) {
         this.host = host;
         this.port = port;
+        map = new HashMap<>();
     }
 
     public void connect() {
@@ -65,7 +71,12 @@ public class J8Redis {
     }
     
     public void set(String key, String value, Consumer<String> listener) {
+        map.put(key, value);
         listener.accept(null);
+    }
+    
+    public void get(String key, Consumer<String> listener) {
+        listener.accept(map.get(key));
     }
 
     public String getHost() {
