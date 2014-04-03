@@ -17,7 +17,7 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
 
     private Object response = null;
     private Deque<ParsingState> states = new ArrayDeque<>();
-    private Deque<Integer> itemsInList = new ArrayDeque<>();
+    private Deque<ListItem> lists = new ArrayDeque<>();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg)
@@ -30,15 +30,12 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
         switch (type) {
         case '*':
             int len = Integer.parseInt(msg.substring(1));
-            if (len == 0) {
-                addToResponse(new ArrayList<Object>());
-            } else if (len == -1) {
-                addToResponse(null);
+            ListItem item = new ListItem(len, new ArrayList<Object>());
+            if (len != -1) {
+                addToResponse(item);
             } else {
-                itemsInList.push(len);
-                addToResponse(new ArrayList<Object>(len));
-                states.push(ParsingState.LIST);
-            }
+                addToResponse(null);
+            } 
             break;
         case '+':
             addToResponse(msg.substring(1));
@@ -63,36 +60,76 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
             if (states.peek() == ParsingState.BATCH_STRING) {
                 states.pop();
                 addToResponse(msg);
-            } 
+            } else {
+                //this is an unknown response, for now, swallow it
+            }
             break;
         }
     }
     
     private void addToResponse(Object obj) {
-        if(states.isEmpty()) {
-            response = obj;
-        } else if (states.peek() == ParsingState.LIST) {
-            ((List<Object>)response).add(obj);
-            Integer len = itemsInList.pop();
-            len--;
-            itemsInList.push(len);
-            if(len == 0) {
-                itemsInList.pop();
-                states.pop();
+        if(lists.isEmpty()) {
+            if(obj instanceof ListItem) {
+                ListItem li = (ListItem)obj;
+                response = li.getList();
+                lists.push(li);
+            } else {
+                response = obj;
             }
+        } else {
+            ListItem top = lists.peek();
+            if(obj instanceof ListItem) {
+                top.addToList(((ListItem) obj).getList());
+                lists.push((ListItem)obj);
+            } else {
+                top.addToList(obj);
+            }
+
+        }
+
+        // This should pop off all full lists, including empty lists with max length of 0
+        while(lists.peek() != null && lists.peek().isFull()){
+            lists.pop();
         }
     }
     
     private boolean isInitialState() {
-        return itemsInList.isEmpty() && states.isEmpty();
+        return lists.isEmpty() && states.isEmpty();
     }
     
     public boolean isResponseReady(){
-        return states.isEmpty() && itemsInList.isEmpty();
+        return states.isEmpty() && lists.isEmpty();
     }
     
     public Object getResponse() {
         return response;
+    }
+    
+    /**
+     * Represents a single list item to be placed on the stack
+     * @author ethan
+     *
+     */
+    private static class ListItem {
+        private final int numberOfItems;
+        private final List<Object> list;
+        
+        public ListItem(final int numItems, final List<Object> list) {
+            this.numberOfItems = numItems;
+            this.list = list;
+        }
+
+        public void addToList(Object obj) {
+            getList().add(obj);
+        }
+        
+        public boolean isFull() {
+            return getList().size() >= numberOfItems;
+        }
+
+        public List<Object> getList() {
+            return list;
+        }
     }
     
 }

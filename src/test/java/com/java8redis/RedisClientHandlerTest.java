@@ -76,8 +76,17 @@ public class RedisClientHandlerTest {
     public void testList(@Mocked ChannelHandlerContext ctx) {
         RedisClientHandler handler = new RedisClientHandler();
 
-        //start the list
-        String msg = "*2";
+        //Try an empty list
+        String msg = "*0";
+        Deencapsulation.invoke(handler, "channelRead0", ctx, msg);
+        assertTrue(handler.isResponseReady());
+        assertTrue(handler.getResponse() instanceof List<?>);
+
+        List<Object> list = (List<Object>)handler.getResponse();
+        assertEquals(0, list.size());
+
+        //start a new list
+        msg = "*3";
         Deencapsulation.invoke(handler, "channelRead0", ctx, msg);
         assertFalse(handler.isResponseReady());
 
@@ -105,9 +114,30 @@ public class RedisClientHandlerTest {
         //Add an empty list
         msg = "*0";
         Deencapsulation.invoke(handler, "channelRead0", ctx, msg);
+        assertFalse(handler.isResponseReady());
+        
+        
+        //Add a simple string to the base list
+        msg = "+Simple";
+        Deencapsulation.invoke(handler, "channelRead0", ctx, msg);
         assertTrue(handler.isResponseReady());
         assertTrue(handler.getResponse() instanceof List<?>);
 
+        list = (List<Object>)handler.getResponse();
+        
+        assertEquals(3, list.size());
+        assertEquals(null, list.get(0));
+        assertTrue(list.get(1) instanceof List<?>);
+        assertEquals("Simple", list.get(2));
+
+        List<Object> list2 = (List<Object>)list.get(1);
+        assertEquals(2, list2.size());
+        assertEquals("Key", list2.get(0));
+        assertTrue(list2.get(1) instanceof List<?>);
+
+        List<Object> list3 = (List<Object>)list2.get(1);
+        assertEquals(0, list3.size());
+        
     }
 
 }
