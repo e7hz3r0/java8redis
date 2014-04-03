@@ -48,12 +48,7 @@ public class J8Redis {
             bootstrap.group(workerGroup);
             bootstrap.channel(NioSocketChannel.class);
             bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-
-                }
-            });
+            bootstrap.handler(new RedisClientInitializer());
             future = bootstrap.connect(host, port);
         } finally {
             workerGroup.shutdownGracefully();

@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.e7hz3r0.J8Redis;
+import com.e7hz3r0.RedisClientInitializer;
 
 public class J8RedisTest {
 
@@ -58,6 +59,8 @@ public class J8RedisTest {
         new Verifications() {
             {
                 new Bootstrap();
+                times = 1;
+                bootstrap.handler(withInstanceOf(RedisClientInitializer.class));
                 times = 1;
                 bootstrap.connect("127.0.0.1", 6379);
                 times = 1;
