@@ -12,6 +12,11 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
+/**
+ * Sets up the pipeline for the Redis client channel. Adds encoders and decoders to the pipeline.
+ * 
+ * @author Ethan Urie
+ */
 public class RedisClientInitializer extends ChannelInitializer<SocketChannel> {
     public static final String DECODER = "decoder";
     public static final String ENCODER = "encoder";

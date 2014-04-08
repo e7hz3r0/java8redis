@@ -5,6 +5,9 @@ import com.e7hz3r0.RedisCommand.RedisCommandEnum;
 /**
  * Encapsulates a command sent to the Redis server. 
  * The string representation of this object is its RESP representation.
+ * 
+ * Currently only supports SET and GET.
+ * 
  * @author Ethan Urie
  *
  */
@@ -33,10 +36,21 @@ public class RedisCommand {
     public final String DELIMITER = "\r\n";
     
 
+    /**
+     * Constructor.
+     * @param cmd The command (SET, GET) to send to Redis
+     * @param key The key for the command
+     */
     public RedisCommand(RedisCommandEnum cmd, String key) {
         this(cmd, key, null);
     }
 
+    /**
+     * Constructor.
+     * @param cmd The command (SET, GET) to send to Redis
+     * @param key The key for the command
+     * @param value The value to set for the associated key
+     */
     public RedisCommand(RedisCommandEnum cmd, String key, String value) {
         this.command = cmd;
         this.key = key;
@@ -59,6 +73,10 @@ public class RedisCommand {
         return key;
     }
     
+    /**
+     * Simple accessor
+     * @return The command enum that will be sent
+     */
     public RedisCommandEnum getCommand() {
         return command;
     }

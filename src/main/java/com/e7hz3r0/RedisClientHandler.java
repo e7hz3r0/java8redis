@@ -11,6 +11,13 @@ import java.util.function.BiConsumer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+/**
+ * Top-level pipeline channel handler. Notified when a new message is received. Maintains callbacks
+ * for received messages.
+ * 
+ * @author Ethan Urie
+ *
+ */
 public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
     private Object response = null;
     private boolean parsingBatchString = false;
@@ -18,6 +25,10 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
     
     private BlockingQueue<BiConsumer<Object, Exception>> callbackQueue = new ArrayBlockingQueue<>(20, true);
     
+    /**
+     * Adds a callback to the queue of callbacks that are triggered on receipt of messages.
+     * @param listener The callback lambda
+     */
     public void addResponseListener(BiConsumer<Object, Exception> listener) {
         callbackQueue.add(listener);
     }
