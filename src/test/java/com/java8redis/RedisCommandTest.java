@@ -41,8 +41,14 @@ public class RedisCommandTest {
 
     @Test
     public void testGetToString() {
-        String expectedString = "*3\r\n$3\r\nGET\r\n$4\r\nKey!\r\n";
+        String expectedString = "*2\r\n$3\r\nGET\r\n$4\r\nKey!\r\n";
         assertEquals(expectedString, getCommand.toString());
     }
 
+    @Test
+    public void testDelToString() {
+        RedisCommand del = new RedisCommand(RedisCommand.RedisCommandEnum.DEL, myKey);
+        String expectedString = "*2\r\n$3\r\nDEL\r\n$4\r\nKey!\r\n";
+        assertEquals(expectedString, del.toString());
+    }
 }

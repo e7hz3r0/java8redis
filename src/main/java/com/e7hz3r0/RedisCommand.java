@@ -14,7 +14,8 @@ import com.e7hz3r0.RedisCommand.RedisCommandEnum;
 public class RedisCommand {
     public enum RedisCommandEnum {
         SET("SET"),
-        GET("GET");
+        GET("GET"), 
+        DEL("DEL");
         
         private final String cmd;
         private RedisCommandEnum(String cmd) {
@@ -83,7 +84,11 @@ public class RedisCommand {
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(ARRAY_CHAR + 3 + DELIMITER);
+        int count = 2;
+        if ( value != null ) {
+            count++;
+        }
+        StringBuilder sb = new StringBuilder(ARRAY_CHAR + count + DELIMITER);
         addStringToStringBuilder(sb, command.toString());
         addStringToStringBuilder(sb, key);
         addStringToStringBuilder(sb, value);

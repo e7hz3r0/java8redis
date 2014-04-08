@@ -2,7 +2,10 @@ package com.java8redis;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -16,11 +19,18 @@ import com.e7hz3r0.J8Redis;
 
 public class J8RedisIT {
     private static Process redisProc;
+    private String key = "MyKey";
+    private String key2 = "MyKey2";
+    private String value = "Myvalue";
+    private String value2 = "Myvalue2";
+    private J8Redis redis;
+    private static int BOOTUP_WAIT_TIME = 6000; //milliseconds
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         ProcessBuilder pb = new ProcessBuilder().command("/opt/local/bin/redis-server");
         redisProc = pb.start();
+        Thread.sleep(BOOTUP_WAIT_TIME);
     }
 
     @AfterClass
@@ -31,6 +41,14 @@ public class J8RedisIT {
     @Before
     public void setUp() throws Exception {
 //        assertTrue(redisProc.isAlive());
+        CountDownLatch cdl = new CountDownLatch(1);
+        redis = new J8Redis("127.0.0.1");
+        redis.connect(ch -> {
+            redis.del(key, (r, error) -> {});
+            redis.del(key2, (r, error) -> {});
+            cdl.countDown();
+        });
+        cdl.await();
     }
 
     @After
@@ -39,16 +57,15 @@ public class J8RedisIT {
 
     @Test
     public void test() {
-        String key = "MyKey";
-        String key2 = "MyKey2";
-        String value = "Myvalue";
-        String value2 = "Myvalue2";
 
         try {
-            J8Redis redis = new J8Redis("127.0.0.1");
-            redis.connect(ch -> {
-                redis.set(key, value, (result, error) -> {
-                    assertNull(error);
+            CountDownLatch cdl = new CountDownLatch(1);
+            redis.set(key, value, (result, error) -> {
+                assertNull(error);
+
+                redis.get(key, (result1, error1) -> {
+                    assertNull(error1);
+                    assertEquals(value, result1);
 
                     redis.set(key2, value2, (result2, error2) -> {
                         assertNull(error2);
@@ -56,15 +73,17 @@ public class J8RedisIT {
                         redis.get(key, (val, error3) -> {
                             assertNull(error3);
                             assertEquals(value, val); 
-                            redis.disconnect();
+                            cdl.countDown();
                         });
                     });
                 });
             });
+            assertTrue(cdl.await(2000, TimeUnit.MILLISECONDS));
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
         } finally {
+            redis.disconnect();
             redisProc.destroy();
         }
     }

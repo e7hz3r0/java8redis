@@ -113,6 +113,15 @@ public class J8Redis {
     public void get(String key, BiConsumer<Object, Exception> listener) {
         sendCommand(new RedisCommand(RedisCommand.RedisCommandEnum.GET, key), listener);
     }
+
+    /**
+     * Simple endpoint to delete a key
+     * @param key
+     * @param listener
+     */
+    public void del(String key, BiConsumer<Object, Exception> listener) {
+        sendCommand(new RedisCommand(RedisCommand.RedisCommandEnum.DEL, key), listener);
+    }
     
     /**
      * Generic endpoint to send a RedisCommand to the server.
