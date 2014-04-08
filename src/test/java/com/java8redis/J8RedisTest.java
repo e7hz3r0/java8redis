@@ -11,8 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.e7hz3r0.J8Redis;
-import com.e7hz3r0.RedisClientInitializer;
+import com.e7hz3r0.j8redis.J8Redis;
+import com.e7hz3r0.j8redis.RedisClientInitializer;
 
 public class J8RedisTest {
 

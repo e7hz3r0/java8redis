@@ -1,4 +1,4 @@
-package com.e7hz3r0;
+package com.e7hz3r0.j8redis;
 
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;

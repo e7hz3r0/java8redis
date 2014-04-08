@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.e7hz3r0.RedisClientHandler;
+import com.e7hz3r0.j8redis.RedisClientHandler;
 
 public class RedisClientHandlerTest {
 

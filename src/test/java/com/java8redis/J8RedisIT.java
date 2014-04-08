@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.e7hz3r0.J8Redis;
+import com.e7hz3r0.j8redis.J8Redis;
 
 public class J8RedisIT {
     private static Process redisProc;
@@ -40,7 +40,7 @@ public class J8RedisIT {
 
     @Before
     public void setUp() throws Exception {
-//        assertTrue(redisProc.isAlive());
+        assertTrue(redisProc.isAlive());
         CountDownLatch cdl = new CountDownLatch(1);
         redis = new J8Redis("127.0.0.1");
         redis.connect(ch -> {

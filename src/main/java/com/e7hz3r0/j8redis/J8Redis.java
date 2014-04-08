@@ -1,4 +1,4 @@
-package com.e7hz3r0;
+package com.e7hz3r0.j8redis;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

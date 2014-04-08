@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.e7hz3r0.RedisCommand;
+import com.e7hz3r0.j8redis.RedisCommand;
 
 public class RedisCommandTest {
     private String myKey;

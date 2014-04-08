@@ -18,9 +18,9 @@ import mockit.Verifications;
 
 import org.junit.Test;
 
-import com.e7hz3r0.CommandEncoder;
-import com.e7hz3r0.RedisCommand;
-import com.e7hz3r0.RedisCommand.RedisCommandEnum;
+import com.e7hz3r0.j8redis.CommandEncoder;
+import com.e7hz3r0.j8redis.RedisCommand;
+import com.e7hz3r0.j8redis.RedisCommand.RedisCommandEnum;
 
 public class CommandEncoderTest {
 

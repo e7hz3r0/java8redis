@@ -1,6 +1,6 @@
-package com.e7hz3r0;
+package com.e7hz3r0.j8redis;
 
-import com.e7hz3r0.RedisCommand.RedisCommandEnum;
+import com.e7hz3r0.j8redis.RedisCommand.RedisCommandEnum;
 
 /**
  * Encapsulates a command sent to the Redis server. 

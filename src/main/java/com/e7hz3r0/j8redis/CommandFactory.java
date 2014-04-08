@@ -1,4 +1,4 @@
-package com.e7hz3r0;
+package com.e7hz3r0.j8redis;
 
 public class CommandFactory {
     public static RedisCommand setCommand(String key, String value) {
