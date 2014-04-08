@@ -2,6 +2,12 @@ package com.e7hz3r0;
 
 import com.e7hz3r0.RedisCommand.RedisCommandEnum;
 
+/**
+ * Encapsulates a command sent to the Redis server. 
+ * The string representation of this object is its RESP representation.
+ * @author Ethan Urie
+ *
+ */
 public class RedisCommand {
     public enum RedisCommandEnum {
         SET("SET"),
@@ -24,7 +30,7 @@ public class RedisCommand {
     
     public final String ARRAY_CHAR = "*";
     public final String BULK_STRING_CHAR = "$";
-    public final String DELIMITER = "\\r\\n";
+    public final String DELIMITER = "\r\n";
     
 
     public RedisCommand(RedisCommandEnum cmd, String key) {

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.nio.NioEventLoopGroup;
 import mockit.*;
 
 import org.junit.After;
@@ -45,16 +46,20 @@ public class J8RedisTest {
     }
 
     @Test
-    public void testConnect(@Mocked final Bootstrap bootstrap) {
+    public void testConnect(@Mocked final Bootstrap bootstrap,
+                            @Mocked final ChannelFuture future) {
         new NonStrictExpectations() {
             {
                 bootstrap.connect("127.0.0.1", 6379);
+                returns(future);
                 times = 1;
             }
         };
 
         J8Redis redis = new J8Redis();
-        redis.connect();
+        redis.connect(ch -> {
+            
+        });
 
         new Verifications() {
             {
@@ -70,37 +75,31 @@ public class J8RedisTest {
 
     @Test
     public void testDisconnect(@Mocked final Channel channel,
-            @Mocked("sync()") final ChannelFuture future,
-            @Mocked final Bootstrap bootstrap) {
+            @Mocked final NioEventLoopGroup group
+            ){
 
         try {
-            new NonStrictExpectations() {
-                {
-                    bootstrap.connect(anyString, anyInt);
-                    returns(future);
-                    future.channel();
-                    returns(channel);
-                    channel.close();
-                    returns(future);
-                    future.sync();
-                    times = 1;
-                }
-            };
+            new NonStrictExpectations() { {
+                channel.close();
+                times = 1;
+                group.shutdownGracefully();
+                times = 1;
+            }};
 
             J8Redis redis = new J8Redis();
-            redis.connect();
+            Deencapsulation.setField(redis, "workerGroup", group);
+            Deencapsulation.setField(redis, "channel", channel);
             redis.disconnect();
 
-            new Verifications() {
-                {
-                    channel.close();
-                    times = 1;
-                    future.sync();
-                    times = 1;
-                }
-            };
+            new Verifications() { {
+                channel.close();
+                times = 1;
+                group.shutdownGracefully();
+                times = 1;
+            }};
         } catch (Exception e) {
-            fail("Unexpected exception");
+            e.printStackTrace();
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 

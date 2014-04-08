@@ -35,13 +35,13 @@ public class RedisCommandTest {
     
     @Test
     public void testToString() {
-        String expectedString = "*3\\r\\n$3\\r\\nSET\\r\\n$4\\r\\nKey!\\r\\n$6\\r\\nValue!\\r\\n";
+        String expectedString = "*3\r\n$3\r\nSET\r\n$4\r\nKey!\r\n$6\r\nValue!\r\n";
         assertEquals(expectedString, setCommand.toString());
     }
 
     @Test
     public void testGetToString() {
-        String expectedString = "*3\\r\\n$3\\r\\nGET\\r\\n$4\\r\\nKey!\\r\\n";
+        String expectedString = "*3\r\n$3\r\nGET\r\n$4\r\nKey!\r\n";
         assertEquals(expectedString, getCommand.toString());
     }
 

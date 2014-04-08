@@ -4,28 +4,27 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.function.BiConsumer;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
-    private enum ParsingState {
-        EMPTY,
-        BATCH_STRING,
-        LIST
-    }
-
     private Object response = null;
-    private Deque<ParsingState> states = new ArrayDeque<>();
+    private boolean parsingBatchString = false;
     private Deque<ListItem> lists = new ArrayDeque<>();
+    
+    private BlockingQueue<BiConsumer<Object, Exception>> callbackQueue = new ArrayBlockingQueue<>(20, true);
+    
+    public void addResponseListener(BiConsumer<Object, Exception> listener) {
+        callbackQueue.add(listener);
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg)
             throws Exception {
-        if(isInitialState()) {
-            response = null;
-        }
-
         final char type = msg.charAt(0);
         switch (type) {
         case '*':
@@ -53,17 +52,26 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
             } else if (len == -1) {
                 addToResponse(null);
             } else {
-                states.push(ParsingState.BATCH_STRING);
+                parsingBatchString = true;
             }
             break;
         default:
-            if (states.peek() == ParsingState.BATCH_STRING) {
-                states.pop();
+            if (parsingBatchString){
+                parsingBatchString = false;
                 addToResponse(msg);
             } else {
                 //this is an unknown response, for now, swallow it
             }
             break;
+        }
+        if(isResponseReady()) {
+            BiConsumer<Object, Exception> consumer = callbackQueue.remove();
+            if (response instanceof Exception) {
+                consumer.accept(null, (Exception) response);
+            } else {
+                consumer.accept(response, null);
+            }
+            response = null;
         }
     }
     
@@ -94,15 +102,21 @@ public class RedisClientHandler extends SimpleChannelInboundHandler<String> {
     }
     
     private boolean isInitialState() {
-        return lists.isEmpty() && states.isEmpty();
+        return lists.isEmpty() && !parsingBatchString;
     }
     
     public boolean isResponseReady(){
-        return states.isEmpty() && lists.isEmpty();
+        return isInitialState() && response != null;
     }
     
     public Object getResponse() {
         return response;
+    }
+    
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
     }
     
     /**

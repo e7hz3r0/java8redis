@@ -3,6 +3,8 @@ package com.java8redis;
 import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -29,15 +31,12 @@ public class CommandEncoderTest {
         String key = "key";
         String value = "value";
         RedisCommand cmd = new RedisCommand(RedisCommandEnum.SET, key, value);
-        String expected = "*3\\r\\n$3\\r\\nSET\\r\\n$3\\r\\nkey\\r\\n$5\\r\\nvalue\\r\\n";
-        ByteBuf buf = ByteBufAllocator.DEFAULT.buffer();
-        assertTrue(buf.isWritable());
+        String expected = "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n";
+        List<Object> out = new ArrayList<>();
         
-        Deencapsulation.invoke(enc, "encode", ctx, cmd, buf);
+        Deencapsulation.invoke(enc, "encode", ctx, cmd, out);
         
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.getBytes(0, bytes);
-        assertEquals(expected, new String(bytes));
+        assertEquals(expected, (String)out.get(0));
     }
 
 }

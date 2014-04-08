@@ -39,7 +39,7 @@ public class RedisClientInitializerTest {
             fail(e.getMessage());
         }
         Map<String, ChannelHandler> pipeline = channel.pipeline().toMap();
-        assertEquals(4, pipeline.size());
+        assertEquals(5, pipeline.size());
     }
 
 }
